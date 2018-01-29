@@ -55,6 +55,12 @@ def SetCursor(RowVal, ColumnVal):
     bz.SetCursor(RowVal, ColumnVal)
 
 
+def Transmit():
+    """Send a transmit key and wait until the window refreshes."""
+    SendKey("<enter>")
+    WaitReady(0, 0)
+
+
 def WaitReady(TimeoutVal, ExtraWaitVal):
     """Suspend script execution until the host screen is ready for keyboard input."""
     bz.WaitReady(TimeoutVal, ExtraWaitVal)
