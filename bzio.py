@@ -40,7 +40,7 @@ def ReadScreen(LengthVal, RowVal, ColumnVal):
     return ret_details[1]
 
 
-def Search(SearchStr, RowVal, ColumnVal):
+def Search(SearchStr):
     """Search the host screen for some specified text."""
     return bz.Search(SearchStr, 1, 1)
 
