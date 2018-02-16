@@ -10,20 +10,53 @@ Many of the STAT panels will also have a create_new method to create a new panel
 
 class FUNC_COMD_panel:
     """Template of MAXIS Panel classes"""
+    # FUNC should be the Function name (ie STAT)
+    # COMD should be the command name (ie MEMB)
     def __init__(self, case_number, footer_month, footer_year, member, instance):
-        self.case = case_number
-        self.month = footer_month
-        self.year = footer_year
-        self.member = member
-        self.instance = instance
+        # this will run on initialization and is useful for two things
+        # 1 - so you can have different cases/members/instances/months in the same script run
+        # 2 - so the class knows within itself the case, month, memner, and instance
+        self.case = case_number         # always use this
+        self.month = footer_month       # always use this
+        self.year = footer_year         # always use this
+        self.member = member            # this will only be for panels that are member specific (ie JOBS, MEMB, etc)
+        self.instance = instance        # this will only be for panels that have (or can have) multiple instances (ie ACCT, ABPS)
+
+    # dictionaries go here
+    # these are used to assign full strings to properties based on the detail sin PF1 Menus
+    global a_new_dictionary     # this needs to be set as global to be used within the classes
+    a_new_dictionary = {"1": "Best verification",   # syntax for a dictionary
+                        "2": "Acceptable",
+                        "4": "Why isn't this a 3",
+                        "N": "No Verification Provided",
+                        "_": "Blank"}
 
     def navigate_to(self):
         """This method will go to the correct panel"""
+        # navigate to ACCI panel in MAXIS
+        at_COMD = bzio.ReadScreen(4, 2, 0)          # check the top of the panel to see where the panel name is - adjust
+        if at_COMD != "COMD":                       # only needs to move in MAXIS if we are not already at the panel
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "FUNC", "COMD")      # moving in MAXIS using a functions module
+        bzio.WriteScreen(self.member, 20, 76)           # only if the panel is member specific
+        bzio.WriteScreen(self.instance, 20, 79)         # only if the panel has multiple instances
+        FuncLib.transmit()                              # transmitting to move to the right member/instance - if neither this is not necessary
 
     def gather_data(self):
         """This method never takes arguments and outputs all of the information from the panel."""
+        # Here we want to list all of the properties. - every class should habe this method
+        # Properties should be all of the data points on the panel. This may requiring scrolling through lists or opening pop ups
+        # these properties can be in booleans, list form, dictionary form or just variables.
+        # be sure to pay attention to the type of output each property has - numbers should be able to do math
 
+    """The rest of the methods will really depend on the panel you are working with. Think about the work you do with the panel and how you can support script writers in accessing and updating the panel"""
+    """A couple of methods that are common"""
+    def create_new(self):
+        pass
 
+    def update_value(self):
+        pass
+
+    def 
 
 class STAT_ABPS_panel:
     """class references STAT/ABPS
