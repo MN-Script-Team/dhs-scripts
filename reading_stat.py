@@ -80,14 +80,25 @@ ADDR.gather_data()      # using the method of the ADDR Panel class to get all in
 # BUSI_02_01 = MAXIS_panels.STAT_BUSI_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "02", "01")
 # BUSI_02_01.create_new("07/15/17", "04", "cash", 800, "1", 150, "1", 120, "01", "02/06/18", 800, 150, 120)
 
-CARS_01_01 = MAXIS_panels.STAT_CARS_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "01", "01")
-CARS_01_01.gather_data()
-CARS_01_01.update_verif("1")
-CARS_01_01.update_value(2300, "1")
+# CARS_01_01 = MAXIS_panels.STAT_CARS_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "01", "01")
+# CARS_01_01.gather_data()
+# CARS_01_01.update_verif("1")
+# CARS_01_01.update_value(2300, "1")
+#
+# CARS_01_new = MAXIS_panels.STAT_CARS_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "01", "02")
+# CARS_01_new.create_new("2", 2015, "Ford", "Astro", 4775, "1", "4", "N")
+# CARS_01_new.update_amount_owed(2025, "01/25/18", "1")
 
-CARS_01_new = MAXIS_panels.STAT_CARS_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "01", "02")
-CARS_01_new.create_new("2", 2015, "Ford", "Astro", 4775, "1", "4", "N")
-CARS_01_new.update_amount_owed(2025, "01/25/18", "1")
+# CASH_01 = MAXIS_panels.STAT_CASH_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "01")
+# CASH_01.update_cash(300)
+# CASH_02 = MAXIS_panels.STAT_CASH_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "02")
+# CASH_02.gather_data()
+
+COEX_01 = MAXIS_panels.STAT_COEX_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "01")
+COEX_01.update_expense("Support", 2, 350, 350)
+
+COEX_02 = MAXIS_panels.STAT_COEX_panel(MAXIS_case_number, MAXIS_footer_month, MAXIS_footer_year, "02")
+COEX_02.update_expense("Alimony", 1, 450, 450)
 
 # this outputs the code from above so we can see it worked.
 print(ADDR.case)
@@ -153,12 +164,27 @@ print(ADDR.effective_date)
 # print("Verified by: %s" % (BUSI_02_01.cash_inc_verif))
 # print("Method used: %s established on %s" % (BUSI_02_01.self_emp_method, BUSI_02_01.method_date))
 
-print("Vehicle 1")
-print("%s - %s %s %s" % (CARS_01_01.type, CARS_01_01.year, CARS_01_01.make, CARS_01_01.model))
-print("Trade-In: %s - Loan: %s - Source: %s" % (CARS_01_01.trade_in_value, CARS_01_01.loan_value, CARS_01_01.value_source))
-print("Use: %s" % (CARS_01_01.use))
+# print("Vehicle 1")
+# print("%s - %s %s %s" % (CARS_01_01.type, CARS_01_01.year, CARS_01_01.make, CARS_01_01.model))
+# print("Trade-In: %s - Loan: %s - Source: %s" % (CARS_01_01.trade_in_value, CARS_01_01.loan_value, CARS_01_01.value_source))
+# print("Use: %s" % (CARS_01_01.use))
+#
+# print("Vehicle 2")
+# print("%s - %s %s %s" % (CARS_01_new.type, CARS_01_new.year, CARS_01_new.make, CARS_01_new.model))
+# print("Trade-In: %s - Loan: %s - Source: %s" % (CARS_01_new.trade_in_value, CARS_01_new.loan_value, CARS_01_new.value_source))
+# print("Use: %s" % (CARS_01_new.use))
 
-print("Vehicle 2")
-print("%s - %s %s %s" % (CARS_01_new.type, CARS_01_new.year, CARS_01_new.make, CARS_01_new.model))
-print("Trade-In: %s - Loan: %s - Source: %s" % (CARS_01_new.trade_in_value, CARS_01_new.loan_value, CARS_01_new.value_source))
-print("Use: %s" % (CARS_01_new.use))
+# print("Member %s has $%s in cash" % (CASH_01.member, CASH_01.amount))
+# print("Member %s has $%s in cash" % (CASH_02.member, CASH_02.amount))
+
+print("Member %s has Court Ordered Expenses of:" % (COEX_01.member))
+print("Support - $%s: Verif: %s, HC Estimate: $%s" % (COEX_01.support_prosp, COEX_01.support_verif, COEX_01.support_hc_est))
+print("Alimony - $%s: Verif: %s, HC Estimate: $%s" % (COEX_01.alimony_prosp, COEX_01.alimony_verif, COEX_01.alimony_hc_est))
+print("Tax Dep - $%s: Verif: %s, HC Estimate: $%s" % (COEX_01.tax_dep_prosp, COEX_01.tax_dep_verif, COEX_01.tax_dep_hc_est))
+print("Other - $%s: Verif: %s, HC Estimate: $%s" % (COEX_01.other_prosp, COEX_01.other_verif, COEX_01.other_hc_est))
+
+print("Member %s has Court Ordered Expenses of:" % (COEX_02.member))
+print("Support - $%s: Verif: %s, HC Estimate: $%s" % (COEX_02.support_prosp, COEX_02.support_verif, COEX_02.support_hc_est))
+print("Alimony - $%s: Verif: %s, HC Estimate: $%s" % (COEX_02.alimony_prosp, COEX_02.alimony_verif, COEX_02.alimony_hc_est))
+print("Tax Dep - $%s: Verif: %s, HC Estimate: $%s" % (COEX_02.tax_dep_prosp, COEX_02.tax_dep_verif, COEX_02.tax_dep_hc_est))
+print("Other - $%s: Verif: %s, HC Estimate: $%s" % (COEX_02.other_prosp, COEX_02.other_verif, COEX_02.other_hc_est))

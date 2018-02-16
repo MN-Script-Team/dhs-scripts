@@ -17,6 +17,9 @@ class FUNC_COMD_panel:
         self.member = member
         self.instance = instance
 
+    def navigate_to(self):
+        """This method will go to the correct panel"""
+
     def gather_data(self):
         """This method never takes arguments and outputs all of the information from the panel."""
 
@@ -62,6 +65,14 @@ class STAT_ABPS_panel:
                "6": "N/A, Minor Caregiver",
                "7": "N/A, HC Child Applicant"}
 
+    def navigate_to(self):
+        # navigate to ABPS panel in MAXIS
+        at_ABPS = bzio.ReadScreen(4, 2, 50)
+        if at_ABPS != "ABPS":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ABPS")
+        bzio.WriteScreen(self.instance, 20, 79)          # navigating to the correct member and instance of the panel
+        FuncLib.transmit()
+
     def gather_data(self):
         """Will gather all data from STAT/ABPS
         Properties created:
@@ -89,9 +100,7 @@ class STAT_ABPS_panel:
                          value is list of detail of parental status and detail of custody)"""
 
         # Navigate to the correct panel to gather information from
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ABPS")
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         self.caregiver = bzio.ReadScreen(2, 4, 47)      # reading caregiver reference number and additing it to the class property
         self.coop = bzio.ReadScreen(1, 4, 73)           # reading support coop from the panel and adding it to class property
@@ -203,6 +212,15 @@ class STAT_ACCI_panel:
                            "3": "Liable Party",
                            "6": "Other"}
 
+    def navigate_to(self):
+        # navigate to ACCI panel in MAXIS
+        at_ACCI = bzio.ReadScreen(4, 2, 44)
+        if at_ACCI != "ACCI":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACCI")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
+        bzio.WriteScreen(self.instance, 20, 79)
+        FuncLib.transmit()
+
     def gather_data(self):
         """Will collect all of the information from defined panel. Class Property outputs are:
         self.type -- Accident Type(string)`
@@ -217,10 +235,7 @@ class STAT_ACCI_panel:
         self.others_involved -- ***** Others Involved ******(Dictionary - Key: Name, Value: List with Indicator detail, address, phone number)"""
 
         # navigating to STAT/ACCI for the member and instance indicated
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACCI")
-        bzio.WriteScreen(self.member, 20, 76)
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         # reading all of the panel and assigning each to an above named property
         type_code = bzio.ReadScreen(2, 6, 47)       # reading type of accident code
@@ -351,10 +366,8 @@ class STAT_ACCI_panel:
         phone -- phone number (string in format xxx-xxx-xxxx)"""
 
         # Navigating to the correct ACCI panel to add new entry
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACCI")
-        bzio.WriteScreen(self.member, 20, 76)
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
+
         FuncLib.PF9()           # Put panel in edit mode
 
         # All of the parameters will be written to new panel, if it is NONE then nothing will be entered
@@ -423,6 +436,15 @@ class STAT_ACCT_panel:
                         "N": "No Verif Provided",
                         "_": "Blank"}
 
+    def navigate_to(self):
+        # navigate to ACCT panel in MAXIS
+        at_ACCT = bzio.ReadScreen(4, 2, 44)
+        if at_ACCT != "ACCT":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACCT")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
+        bzio.WriteScreen(self.instance, 20, 79)
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to get all information from ACCT panel indicated.
         Class Properies created:
@@ -441,10 +463,7 @@ class STAT_ACCT_panel:
             self.next_interest_date -- date of next interest (string of date in MM/YY format) - empty if no date listed on panel"""
 
         # navigating to the correct ACCT panel - for the right member and instance.
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACCT")
-        bzio.WriteScreen(self.member, 20, 76)
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         account_type_code = bzio.ReadScreen(2, 6, 44)   # reading account type code
         self.type = account_types[account_type_code]    # assigning account type detail from dictionary to property
@@ -611,6 +630,14 @@ class STAT_ACUT_panel:
 
     # No dictionaries for this class at this time
 
+    def navigate_to(self):
+        # navigate to ACCT panel in MAXIS
+        at_ACCT = bzio.ReadScreen(4, 2, 52)
+        if at_ACCT != "ACCT":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACCT")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member of the panel
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to get all information from STAT/ACUT for the specified member.
         Class Propertied defined in this method:
@@ -650,9 +677,7 @@ class STAT_ACUT_panel:
             self.dwp_phone -- boolean of if phone is used "_" defaults to False
             self.dwp_amount -- float of the amount on panel - would be blank if no dwp phone"""
         # navigate to STAT/ACUT for member
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACUT")
-        bzio.WriteScreen(self.member, 20, 76)
-        FuncLib.transmit()
+        self.navigate_to()
 
         if bzio.ReadScreen(1, 6, 42) == "Y":        # reading the Y/N code for cshared and setting proprty as T/F
             self.shared = True
@@ -764,8 +789,7 @@ class STAT_ACUT_panel:
         other -- LIST in order - [retro verif, retro amount, prospective verif, prospective amount]
         phone -- boolean - defaulted to false"""
         # navigate to STAT/ACUT for member and creates a new panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ACUT")
-        bzio.WriteScreen(self.member, 20, 76)
+        self.navigate_to()
         bzio.WriteScreen("NN", 20, 79)
         FuncLib.transmit()
 
@@ -977,11 +1001,18 @@ class STAT_ADDR_panel:
                         "OT": "Other Document",
                         "NO": "No Verification Provided"}
 
+    def navigate_to(self):
+        # navigate to ADDR panel in MAXIS
+        at_ADDR = bzio.ReadScreen(4, 2, 44)
+        if at_ADDR != "ADDR":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ADDR")
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to gather information from ADDR and fill class properties"""
 
         # Navigates to STAT/ADDR - no instance or member needed as there is only 1 in each case
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ADDR")
+        self.navigate_to()
 
         # reading all information from the panel and assigning it to class properties
         self.effective_date = "%s/%s/%s" % (bzio.ReadScreen(2, 4, 43), bzio.ReadScreen(2, 4, 46), bzio.ReadScreen(2, 4, 49))  # formatting date as mm/dd/yy
@@ -1051,6 +1082,14 @@ class STAT_ADME_panel:
         self.year = footer_year
         self.member = member
 
+    def navigate_to(self):
+        # navigate to ADME panel in MAXIS
+        at_ADME = bzio.ReadScreen(4, 2, 45)
+        if at_ADME != "ADME":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ADME")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member of the panel
+        FuncLib.transmit()
+
     def gather_data(self):
         """This method will read the panel and save to class properties
         Class Properties: self.birthdate -- listed on ADME in mm/dd/yy format
@@ -1060,9 +1099,7 @@ class STAT_ADME_panel:
                           self.snap_add_date -- date listed on ADME in mm/dd/yy format - will be None if date is not filled in"""
 
         # navigate to the correct STAT/ADME panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ADME")
-        bzio.WriteScreen(self.member, 20, 76)
-        FuncLib.transmit()
+        self.navigate_to()
 
         if bzio.ReadScreen(1, 2, 73) != "0":                # checking to be sure a panel exists
             self.birthdate = bzio.ReadScreen(8, 5, 36)      # reading birthdate and arrival date from ADME
@@ -1095,8 +1132,7 @@ class STAT_ADME_panel:
         All arguments are required - script must determine which are important."""
 
         # navigate to the correct STAT/ADME panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ADME")
-        bzio.WriteScreen(self.member, 20, 76)
+        self.navigate_to()
         bzio.WriteScreen("NN", 20, 79)
         FuncLib.transmit()
 
@@ -1131,6 +1167,14 @@ class STAT_ALIA_panel:
         self.year = footer_year
         self.member = member
 
+    def navigate_to(self):
+        # navigate to ALIA panel in MAXIS
+        at_ALIA = bzio.ReadScreen(4, 2, 46)
+        if at_ALIA != "ALIA":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALIA")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member of the panel
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to gather information for STAT/ALIA for the specific member indicated.
         Properties created: self.alias_names -- Dictionary of names in ALIA - key is the MAXIS row, value is a list last name, first name, middle initial
@@ -1139,9 +1183,7 @@ class STAT_ALIA_panel:
                             self.secondary_ssn_exists -- boolean to identify if a secondary ssn exists"""
 
         # navigate to the correct STAT/ALIA panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALIA")
-        bzio.WriteScreen(self.member, 20, 76)
-        FuncLib.transmit()
+        self.navigate_to()
 
         self.alias_names = {}               # setting the property to a dictionary so that adding key and value pairs is easiest
         self.alias_exists = True            # setting this as true for the default - easier to read for a a false and reset if false.
@@ -1199,9 +1241,7 @@ class STAT_ALIA_panel:
                    middle -- middle initial to be entered in ALIA"""
 
         # navigate to the correct STAT/ALIA panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALIA")
-        bzio.WriteScreen(self.member, 20, 76)
-        FuncLib.transmit()
+        self.navigate_to()
         FuncLib.PF9()           # Put panel in edit mode
 
         # TODO May need error handling for if the ALIA name lines are FULL
@@ -1221,9 +1261,7 @@ class STAT_ALIA_panel:
                    do not need to assign a verif as the only worker entry is 'P'"""
 
         # navigate to the correct STAT/ALIA panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALIA")
-        bzio.WriteScreen(self.member, 20, 76)
-        FuncLib.transmit()
+        self.navigate_to()
         FuncLib.PF9()           # Put panel in edit mode
 
         # TODO May need error handling for if the ALIA ssn lines are FULL
@@ -1260,6 +1298,13 @@ class STAT_ALTP_panel:
                     "8": "Emergency Payee",
                     "9": "MFIP Minor Residing with Parent"}
 
+    def navigate_to(self):
+        # navigate to ALTP panel in MAXIS
+        at_ALTP = bzio.ReadScreen(4, 2, 48)
+        if at_ALTP != "ALTP":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALTP")
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to read the ALTP panel and add all inforamtion to class properties.
         Properties created: reason -- Information about why payee exists (full detail from PF1 menu)
@@ -1274,7 +1319,7 @@ class STAT_ALTP_panel:
                             phone_ext -- estension """
 
         # navigate to the STAT/ALTP panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALTP")
+        self.navigate_to()
 
         reason_code = bzio.ReadScreen(1, 5, 37)
         self.reason = payee_reason[reason_code]
@@ -1309,7 +1354,7 @@ class STAT_ALTP_panel:
                                ext -- extension of phone number of alt payee"""
 
         # navigate to the STAT/ALTP panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALTP")
+        self.navigate_to()
         bzio.WriteScreen("NN", 20, 79)      # create new panel and transmit to put it in edit mode
         FuncLib.transmit()
 
@@ -1355,7 +1400,7 @@ class STAT_ALTP_panel:
         """Method used to enter the end of alt payee
         Argument: end_date -- date to end the alt payee"""
         # navigate to the STAT/ALTP panel and put it in edit mode
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALTP")
+        self.navigate_to()
         FuncLib.PF9()
 
         # FIXME add function to be sure the panel is in edit mode
@@ -1382,7 +1427,7 @@ class STAT_ALTP_panel:
                                phone -- phone number of alt payee - format xxx-xxx-xxxx
                                ext -- extension of phone number of alt payee"""
         # navigate to the STAT/ALTP panel and put it in edit mode
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "ALTP")
+        self.navigate_to()
         FuncLib.PF9()
 
         # FIXME add function to be sure the panel is in edit mode
@@ -1457,6 +1502,13 @@ class STAT_AREP_panel:
         self.month = footer_month
         self.year = footer_year
 
+    def navigate_to(self):
+        # navigate to AREP panel in MAXIS
+        at_AREP = bzio.ReadScreen(4, 2, 53)
+        if at_AREP != "AREP":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "AREP")
+        FuncLib.transmit()
+
     def gather_data(self):
         """This method will gather information from an existing AREP panel and add the information to class properties.
         Properties created: AREP_exists -- boolean if AREP information is present
@@ -1488,9 +1540,7 @@ class STAT_AREP_panel:
                             FS_alt_rep_ext_two -- extension of FS Alt Rep's second phone number"""
 
         # navigate to the STAT/AREP panel
-        at_AREP = bzio.ReadScreen(4, 2, 53)
-        if at_AREP != "AREP":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "AREP")
+        self.navigate_to()
 
         self.AREP_exists = True
         self.FS_alt_rep_exists = True
@@ -1575,7 +1625,7 @@ class STAT_AREP_panel:
                    months_of_disq -- number of months of disq - needed if disq is set to Y"""
 
         # navigate to the STAT/AREP panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "AREP")
+        self.navigate_to()
 
         # putting the panel in edit mode
         if bzio.ReadScreen(1, 2, 73) == "0":    # if no panel exists - create a new one
@@ -1673,7 +1723,7 @@ class STAT_AREP_panel:
                    months_of_disq -- number of months of disq - needed if disq is set to Y"""
 
         # navigate to the STAT/AREP panel
-        FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "AREP")
+        self.navigate_to()
 
         # putting the panel in edit mode
         if bzio.ReadScreen(1, 2, 73) == "0":    # if no panel exists - create a new one
@@ -1855,6 +1905,11 @@ class STAT_BILS_panel:
                          "M": "Old, Unpaid Medical Bills",
                          "R": "Reimburseable"}
 
+    def navigate_to(self):
+        at_BILS = bzio.ReadScreen(4, 2, 54)
+        if at_BILS != "BILS":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BILS")
+
     def gather_data(self):
         """Method will gather all the information from BILS
         Properties generated: self.bills_exist -- boolean to identify if any bills are listed on the panel
@@ -1875,9 +1930,7 @@ class STAT_BILS_panel:
                                                 10    -- ROW the bill is listed on in panel"""
 
         # navigate to BILS panel in MAXIS
-        at_BILS = bzio.ReadScreen(4, 2, 54)
-        if at_BILS != "BILS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BILS")
+        self.navigate_to()
 
         while bzio.ReadScreen(10, 24, 14) != "FIRST PAGE":      # ensuring we are starting from page 1
             FuncLib.PF19()
@@ -1952,9 +2005,7 @@ class STAT_BILS_panel:
                                depdnt_indc -- boolean for if bill is for a dependent who is not in the household - default to False"""
 
         # navigate to BILS panel in MAXIS
-        at_BILS = bzio.ReadScreen(4, 2, 54)
-        if at_BILS != "BILS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BILS")
+        self.navigate_to()
 
         while bzio.ReadScreen(10, 24, 14) != "FIRST PAGE":      # ensuring we are starting from page 1
             FuncLib.PF19()
@@ -2007,6 +2058,11 @@ class STAT_BUDG_panel:
                         "W": "Worker",
                         "C": "Converted"}
 
+    def navigate_to(self):
+        at_BUDG = bzio.ReadScreen(4, 2, 52)
+        if at_BUDG != "BUDG":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUDG")
+
     def gather_data(self):
         """This method will pull data from STAT/BUDG
         Properties generated: self.hc_app_date -- date of hc application - format mm/dd/yy
@@ -2016,9 +2072,7 @@ class STAT_BUDG_panel:
                               self.past_budgets -- list of all past budgets"""
 
         # navigate to BUDG panel in MAXIS
-        at_BILS = bzio.ReadScreen(4, 2, 52)
-        if at_BILS != "BUDG":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUDG")
+        self.navigate_to()
 
         # reading information from the panel and assigning to Properties
         # also formatting dates
@@ -2052,9 +2106,7 @@ class STAT_BUDG_panel:
         THIS METHOD WILL SEND THE CASE THROUGH BACKGROUND"""
 
         # navigate to BUDG panel in MAXIS
-        at_BILS = bzio.ReadScreen(4, 2, 52)
-        if at_BILS != "BUDG":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUDG")
+        self.navigate_to()
 
         # setting the panel to edit mode
         FuncLib.PF9()
@@ -2121,6 +2173,14 @@ class STAT_BUSI_panel:
                           "N": "No Verification Provided",
                           "_": "Blank"}
 
+    def navigate_to(self):
+        at_BUSI = bzio.ReadScreen(4, 2, 51)
+        if at_BUSI != "BUSI":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUSI")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
+        bzio.WriteScreen(self.instance, 20, 79)
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to read panel and generate class properties.
         Properties created: business_type -- detail of income type code (string)
@@ -2159,12 +2219,7 @@ class STAT_BUSI_panel:
                             """
 
         # navigate to BUSI panel in MAXIS
-        at_BILS = bzio.ReadScreen(4, 2, 51)
-        if at_BILS != "BUSI":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUSI")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         # TODO create and insert method to verify BUSI panel exists before trying to read
 
@@ -2275,8 +2330,8 @@ class STAT_BUSI_panel:
                                retro_expense -- amount of retro counted expenses
                                retro_hours -- reported retro hours"""
         # navigate to BUSI panel in MAXIS
-        at_BILS = bzio.ReadScreen(4, 2, 51)
-        if at_BILS != "BUSI":
+        at_BUSI = bzio.ReadScreen(4, 2, 51)
+        if at_BUSI != "BUSI":
             FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUSI")
         bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
         bzio.WriteScreen("NN", 20, 79)
@@ -2350,12 +2405,7 @@ class STAT_BUSI_panel:
                                retro_hours -- reported retro hours"""
 
         # navigate to BUSI panel in MAXIS
-        at_BUSI = bzio.ReadScreen(4, 2, 51)
-        if at_BUSI != "BUSI":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "BUSI")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         FuncLib.PF9()       # putting panel in edit mode
 
@@ -2485,6 +2535,15 @@ class STAT_CARS_panel:
                     "0": "Long Distance Employment Travel",
                     "A": "Carry Heating Fuel or Water"}
 
+    def navigate_to(self):
+        # navigate to CARS panel in MAXIS
+        at_CARS = bzio.ReadScreen(4, 2, 44)
+        if at_CARS != "CARS":
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CARS")
+        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
+        bzio.WriteScreen(self.instance, 20, 79)
+        FuncLib.transmit()
+
     def gather_data(self):
         """Method to read panel and generate class properties
         Properties generated: type -- kind of vehicle panel is for - full string from dictionary
@@ -2502,13 +2561,7 @@ class STAT_CARS_panel:
                               hc_clt_benefit -- if vehicle is for MA client - boolean
                               joint_owner -- if vehicle is jointly owned - boolean
                               share_ratio -- the ratio that the vehicle is shared at - string"""
-        # navigate to CARS panel in MAXIS
-        at_CARS = bzio.ReadScreen(4, 2, 44)
-        if at_CARS != "CARS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CARS")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         # TODO create and insert method to verify CARS panel exists before trying to read
 
@@ -2557,12 +2610,7 @@ class STAT_CARS_panel:
                                owner_verif -- ownership verificatio - default to 'N' - options - 1, 2, 3, 4, 5, N
                                share_ratio -- ratio of 1/1 defaulted - can be changed - should be in x/y format - joint owner determined by this"""
         # navigate to CARS panel in MAXIS
-        at_CARS = bzio.ReadScreen(4, 2, 44)
-        if at_CARS != "CARS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CARS")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen("NN", 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         instance = bzio.ReadScreen(2, 2, 72).strip()    # assigning the instance to class variable
         if len(instance) == 1:
@@ -2597,12 +2645,7 @@ class STAT_CARS_panel:
         Argument requirements: trade_in -- trade-in value - as a float
                                value_source -- source code - options - 1, 2, 3, 4 """
         # navigate to CARS panel in MAXIS
-        at_CARS = bzio.ReadScreen(4, 2, 44)
-        if at_CARS != "CARS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CARS")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         FuncLib.PF9()       # puts panel in edit mode
 
@@ -2622,12 +2665,7 @@ class STAT_CARS_panel:
         """Method to update the ownershiup verification code
         owner_verif -- ownership verificatio - options - 1, 2, 3, 4, 5, N"""
         # navigate to CARS panel in MAXIS
-        at_CARS = bzio.ReadScreen(4, 2, 44)
-        if at_CARS != "CARS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CARS")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         FuncLib.PF9()       # puts panel in edit mode
 
@@ -2642,13 +2680,7 @@ class STAT_CARS_panel:
         Arguments: amount -- value of the loan balance
                    owed_date -- date of the loan balance - mm/dd/yy format
                    owed_verif -- verif code of the loan balance - options: 1, 2, 3, 4, N"""
-        # navigate to CARS panel in MAXIS
-        at_CARS = bzio.ReadScreen(4, 2, 44)
-        if at_CARS != "CARS":
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CARS")
-        bzio.WriteScreen(self.member, 20, 76)           # navigating to the correct member and instance of the panel
-        bzio.WriteScreen(self.instance, 20, 79)
-        FuncLib.transmit()
+        self.navigate_to()
 
         FuncLib.PF9()       # puts panel in edit mode
 
@@ -2670,29 +2702,26 @@ class STAT_CASH_panel:
         self.case = case_number
         self.month = footer_month
         self.year = footer_year
-        self.member
+        self.member = member
+
+    def navigate_to(self):
+        # navigate to the STAT/CASH panel
+        at_CASH = bzio.ReadScreen(4, 2, 42)
+        if at_CASH != "CASH":
+            # navigate to the STAT/CASH panel
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CASH")
+        bzio.WriteScreen(self.member, 20, 76)       # going to the panel for the correct member
+        FuncLib.transmit()
 
     def gather_data(self):
         """Method to gather information from the panel.
         Properties created: amount -- value of cash indicated - float"""
-        # navigate to the STAT/CASH panel
-        at_CASH = bzio.ReadScreen(4, 2, 42)
-        if at_CASH != "CASH":
-            # navigate to the STAT/CASH panel
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CASH")
-        bzio.WriteScreen(self.member, 20, 76)       # going to the panel for the correct member
-        FuncLib.transmit()
+        self.navigate_to()
 
         self.amount = FuncLib.read_float_from_BZ(8, 8, 39)  # reading the value as a float for maths
 
     def update_cash(self, amount):
-        # navigate to the STAT/CASH panel
-        at_CASH = bzio.ReadScreen(4, 2, 42)
-        if at_CASH != "CASH":
-            # navigate to the STAT/CASH panel
-            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "CASH")
-        bzio.WriteScreen(self.member, 20, 76)       # going to the panel for the correct member
-        FuncLib.transmit()
+        self.navigate_to()
 
         # putting the panel in edit mode
         if bzio.ReadScreen(1, 2, 73) == "0":    # if no panel exists - create a new one
@@ -2711,6 +2740,8 @@ class STAT_CASH_panel:
 
         FuncLib.transmit()                      # submitting the panel - saving the value or deleting the panel
 
+        self.gather_data()
+
 
 class STAT_COEX_panel:
     """Class references the STAT/COEX panel.
@@ -2723,30 +2754,135 @@ class STAT_COEX_panel:
         self.case = case_number
         self.month = footer_month
         self.year = footer_year
-        self.member
+        self.member = member
+
+    global coex_verifs
+    coex_verifs = {"1": "Cancelled Checks/Money Orders",
+                       "2": "Receipts",
+                       "3": "Collateral Statement",
+                       "4": "Other Document",
+                       "N": "No Verif Provided",
+                       "_": None}
+
+    global tax_dep_verifs
+    tax_dep_verifs = {"1": "Tax Form",
+                      "2": "Colateral Statement",
+                      "N": "No Verif Provided",
+                      "_": None}
+    global fin_circ
+    fin_circ = {"1": "No Petition to Modify Support",
+                "2": "Petition to Modify Support",
+                "_": None}
+
+    def navigate_to(self):
+        # navigate to the STAT/COEX panel
+        at_COEX = bzio.ReadScreen(4, 2, 51)
+        if at_COEX != "COEX":
+            # navigate to the STAT/COEX panel
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "STAT", "COEX")
+        bzio.WriteScreen(self.member, 20, 76)       # going to the panel for the correct member
+        FuncLib.transmit()
+
 
     def gather_data(self):
         """Method will collect all the information from the panel and assign it to class properties.
-        Propertis created: support_retro --
-                           support_prosp --
-                           support_verif --
-                           support_hc_est --
-                           alimony_retro --
-                           alimony_prosp --
-                           alimony_verif --
-                           alimony_hc_est --
-                           tax_dep_retro --
-                           tax_dep_prosp --
-                           tax_del_verif --
-                           tax_dep_hc_est --
-                           other_retro --
-                           other_prosp --
-                           other_verif --
-                           other_hc_est --
-                           total_retro --
-                           total_prosp --
-                           change_in_fin_circ --"""
-        pass
+        Propertis created: support_retro -- amount of support in retro month (float)
+                           support_prosp -- amount of support in prosp month (float)
+                           support_verif -- verif of support expense (full string from dictionary)
+                           support_hc_est -- amount of support as hc estimate (float)
+                           alimony_retro -- amount of alimony in retro month (float)
+                           alimony_prosp -- amount of alimony in prosp month (float)
+                           alimony_verif -- verif of alimony expense (full string from dictionary)
+                           alimony_hc_est -- amount of alimony as hc estimate (float)
+                           tax_dep_retro -- amount of tax dependent expense in retro month (float)
+                           tax_dep_prosp -- amount of tax dependent expense in prosp month (float)
+                           tax_del_verif -- verif of tax dependent expense (full string from dictionary)
+                           tax_dep_hc_est -- amount of tax dependent expense as hc estimate (float)
+                           other_retro -- amount of other expense in retro month (float)
+                           other_prosp -- amount of other expense in prosp month (float)
+                           other_verif -- verif of other expense (full string from dictionary)
+                           other_hc_est -- amount of other expense as hc estimate (float)
+                           total_retro -- amount of total expense in retro month (float)
+                           total_prosp -- amount of total expense in prosp month (float)
+                           total_hc_est -- amount of total expense as hc estimate (float)
+                           change_in_fin_circ -- Order change information (full string from dictionary)"""
+
+        self.navigate_to()              # going to the panel
+
+        # Reading the support information and assigning it to the class properties
+        self.support_verif = coex_verifs[bzio.ReadScreen(1, 10, 36)]        # rassigning the value from dictionary
+        self.support_retro = FuncLib.read_float_from_BZ(8, 10, 45)          # reading the value as a float for maths
+        self.support_prosp = FuncLib.read_float_from_BZ(8, 10, 63)
+
+        # Reading the alimony information and assigning it to the class properties
+        self.alimony_verif = coex_verifs[bzio.ReadScreen(1, 11, 36)]        # rassigning the value from dictionary
+        self.alimony_retro = FuncLib.read_float_from_BZ(8, 11, 45)          # reading the value as a float for maths
+        self.alimony_prosp = FuncLib.read_float_from_BZ(8, 11, 63)
+
+        # Reading the Tax Dependency information and assigning it to the class properties
+        self.tax_dep_verif = tax_dep_verifs[bzio.ReadScreen(1, 12, 36)]        # rassigning the value from dictionary
+        self.tax_dep_retro = FuncLib.read_float_from_BZ(8, 12, 45)             # reading the value as a float for maths
+        self.tax_dep_prosp = FuncLib.read_float_from_BZ(8, 12, 63)
+
+        # Reading the other information and assigning it to the class properties
+        self.other_verif = coex_verifs[bzio.ReadScreen(1, 13, 36)]        # rassigning the value from dictionary
+        self.other_retro = FuncLib.read_float_from_BZ(8, 13, 45)          # reading the value as a float for maths
+        self.other_prosp = FuncLib.read_float_from_BZ(8, 13, 63)
+
+        # Reading the other information and assigning it to the class properties
+        self.total_retro = FuncLib.read_float_from_BZ(8, 15, 45)          # reading the value as a float for maths
+        self.total_prosp = FuncLib.read_float_from_BZ(8, 15, 63)
+
+        self.change_in_fin_circ = fin_circ[bzio.ReadScreen(1, 17, 61)]# Reading change in circumstances
+
+        bzio.WriteScreen("X", 18, 44)       # Opening the HC Expense Estimate
+        bzio.Transmit()
+
+        # Reading the HC Estimates
+        self.support_hc_est = FuncLib.read_float_from_BZ(8, 6, 38)
+        self.alimony_hc_est = FuncLib.read_float_from_BZ(8, 7, 38)
+        self.tax_dep_hc_est = FuncLib.read_float_from_BZ(8, 8, 38)
+        self.other_hc_est = FuncLib.read_float_from_BZ(8, 9, 38)
+        self.total_hc_est = FuncLib.read_float_from_BZ(8, 11, 38)
+
+        FuncLib.PF3()       # Closing the HC Expense Estimate window
+
+    def update_expense(self, expense_type, verif, retro, prospective):
+        """Method to change one of the types of amounts.
+        Arguments: expense_type -- one of the 4 types - (Support, Alimony, Tax Dep, Other)
+                   verif -- verification code (1, 2, 3, 4, N)
+                   retro -- amount of the expense in retro month
+                   prospective -- amount of the expense in the prosp month"""
+
+        self.navigate_to()
+
+        # putting the panel in edit mode
+        if bzio.ReadScreen(1, 2, 73) == "0":    # if no panel exists - create a new one
+            bzio.WriteScreen("NN", 20, 79)
+            FuncLib.transmit()
+        else:                                   # if a panel does exists - put in edit mode
+            FuncLib.PF9()
+
+        # the line is different for each type of expense
+        if expense_type is "Support":               # for support
+            line = 10
+        if expense_type is "Alimony":               # for alimony
+            line = 11
+        if expense_type is "Tax Dep":               # for tax dependency
+            line = 11
+        if expense_type is "Other":               # for other expenses
+            line = 11
+
+        # writing the amount in to the panel
+        bzio.WriteScreen(verif, line, 36)           # verif code
+
+        bzio.WriteScreen("        ", line, 45)      # blanking out the line in case there was already an amount listed
+        bzio.WriteScreen("        ", line, 63)
+
+        bzio.WriteScreen(retro, line, 45)           # adding the amounts to the panel
+        bzio.WriteScreen(prospective, line, 63)
+
+        self.gather_data()      # Filling the class properties
 
 
 class STAT_DCEX_panel:

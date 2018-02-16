@@ -15,6 +15,7 @@ def read_float_from_BZ(length, row, col):
         MAXIS_number = 0
 
     MAXIS_number = float(MAXIS_number)
+    MAXIS_number = '{:,.2f}'.format(MAXIS_number)
     return MAXIS_number
 
 
