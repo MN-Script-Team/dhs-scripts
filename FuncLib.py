@@ -239,6 +239,12 @@ def navigate_to_MAXIS_screen(case_number, footer_month, footer_year, function_to
                 SELF_check = bzio.ReadScreen(4, 2, 50)
 
 
+def navigate_to_PRISM_screen(panel_name):
+    bzio.WriteScreen(panel_name, 21, 18)
+    bzio.SendKey ("<enter>")
+    bzio.WaitReady(0, 0)
+
+
 def start_a_blank_case_note():
     navigate_to_MAXIS_screen("CASE", "NOTE")
     mode_check = ""
