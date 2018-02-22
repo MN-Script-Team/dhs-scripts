@@ -7,6 +7,7 @@ Each of the panels will have a gather_data method used to get all of the informa
 Calling class_name.gather_data() will create class properties for each of the data elements.
 Many of the STAT panels will also have a create_new method to create a new panel."""
 
+# TODO add funtionality to any update or create new method to check and see if the data expires
 
 class FUNC_COMD_panel:
     """Template of MAXIS Panel classes"""
@@ -31,6 +32,9 @@ class FUNC_COMD_panel:
                         "N": "No Verification Provided",
                         "_": "Blank"}
 
+    # now we start adding methods - these are functions that are associated with the class
+    # these will do things on the panels - get information, change information, etc
+    # NOTE that all methods within a class take at least a 'self' parameter - this never needs to be listed when the method is called
     def navigate_to(self):
         """This method will go to the correct panel"""
         # navigate to ACCI panel in MAXIS
@@ -39,7 +43,7 @@ class FUNC_COMD_panel:
             FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "FUNC", "COMD")      # moving in MAXIS using a functions module
         bzio.WriteScreen(self.member, 20, 76)           # only if the panel is member specific
         bzio.WriteScreen(self.instance, 20, 79)         # only if the panel has multiple instances
-        FuncLib.transmit()                              # transmitting to move to the right member/instance - if neither this is not necessary
+        bzio.transmit()                              # transmitting to move to the right member/instance - if neither this is not necessary
 
     def gather_data(self):
         """This method never takes arguments and outputs all of the information from the panel."""
@@ -47,16 +51,64 @@ class FUNC_COMD_panel:
         # Properties should be all of the data points on the panel. This may requiring scrolling through lists or opening pop ups
         # these properties can be in booleans, list form, dictionary form or just variables.
         # be sure to pay attention to the type of output each property has - numbers should be able to do math
+        self.navigate_to()      # use this method to go to this panel
+
+        self.person = bzio.ReadScreen(22, 5, 15).replace("_", "")        # read all information from the panel and assign to properties to be accessed
+        self.verification = a_new_dictionary[bzio.ReadScreen(1, 8, 55)]     # read the code for anything with a PF1 menu and assign the property with the verification detail from dictionary
+
+        # NOTE that there may be navigatio required to reading all of the panel (opening the PIC or the JOBS panel or the Income detail on BUSI) or scrolling - on BILS or ABPS
+        # these navigations should be handled here in the gather data function so that all of the information associated with the panel can be accessed by the class and running one function
 
     """The rest of the methods will really depend on the panel you are working with. Think about the work you do with the panel and how you can support script writers in accessing and updating the panel"""
     """A couple of methods that are common"""
-    def create_new(self):
-        pass
+    def create_new(self, person, detail, value, verification):
+        """Explain the parameters and the method here."""
+        # sometimes this can't use the navigate_to method because it may error if an instance is entered
+        # navigate to ACCI panel in MAXIS
+        at_COMD = bzio.ReadScreen(4, 2, 0)          # check the top of the panel to see where the panel name is - adjust
+        if at_COMD != "COMD":                       # only needs to move in MAXIS if we are not already at the panel
+            FuncLib.navigate_to_MAXIS_screen(self.case, self.month, self.year, "FUNC", "COMD")      # moving in MAXIS using a functions module
+        bzio.WriteScreen(self.member, 20, 76)           # only if the panel is member specific
+        bzio.WriteScreen("NN", 20, 79)
+        bzio.Transmit()
 
-    def update_value(self):
-        pass
+        # wrtiting each of the parameters passed to the method in to the correc location of the panel
+        bzio.WriteScreen(value, 6, 15)
+        bzio.WriteScreen(verification, 8, 55)
+        bzio.WriteScreen(person, 5, 15)
+        bzio.WriteScreen(detail, 5, 66)
 
-    def 
+        bzio.Transmit()         # transmit to submit and save the panel
+        self.gather_data()      # at the end of adding all of the data - run the gather data method to fill the class properties
+
+    def update_value(self, value, verification):
+        """This method may be helpful if there are certain items that are often updated (perhaps an account panel)"""
+
+        self.navigate_to()      # use the method to move to the panel
+
+        bzio.PF9()              # putting the panel in edit mode
+
+        # blanking a field that may already have an amount listed in it. So that there aren't left over characters
+        bzio.WriteScreen("        ", 6, 15)
+        # wrtiting each of the parameters passed to the method in to the correc location of the panel
+        bzio.WriteScreen(value, 6, 15)
+        bzio.WriteScreen(verification, 8, 55)
+
+        bzio.Transmit()         # transmit to submit and save the panel
+        self.gather_data()      # at the end of adding all of the data - run the gather data method to fill the class properties
+
+    def new_verification(self, verification):
+        """This method would only update one variable - determining the methods that would be beneficial will be a vital part of creating these classes.
+        However, it will also be very easy to create new methods or properties."""
+        self.navigate_to()      # use the method to move to the panel
+
+        bzio.PF9()              # putting the panel in edit mode
+
+        bzio.WriteScreen(verification, 8, 55)
+
+        bzio.Transmit()         # transmit to submit and save the panel
+        self.gather_data()      # at the end of adding all of the data - run the gather data method to fill the class properties
+
 
 class STAT_ABPS_panel:
     """class references STAT/ABPS
@@ -649,6 +701,7 @@ class STAT_ACCT_panel:
 
     # TODO create update balance method for STAT_ACCT_panel
     # TODO create update verification method for STAT_ACCT_panel
+    # TODO create a method to review an account panel for correct expedited coding
 
 
 class STAT_ACUT_panel:
