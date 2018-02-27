@@ -7,6 +7,128 @@ Each of the panels will have a gather_data method used to get all of the informa
 Calling class_name.gather_data() will create class properties for each of the data elements.
 Many of the STAT panels will also have a create_new method to create a new panel."""
 
+
+def read_pf1_menu(self, code_length, code_row, code_col, menu_code_col, menu_desc_col):
+    panel_code = bzio.ReadScreen(code_length, code_row, code_col)
+
+    if panel_code.rplace("_", "") == "":
+        panel_description = ""
+        bzio.SetCursor(code_row, code_col)
+        bzio.PF1()
+        panel_description = ""
+        panel_row = 14
+        while panel_description == "":
+            the_code = bzio.ReadScreen(code_length, panel_row, code_col)
+            if the_code == panel_code:
+                panel_description = bzio.ReadScreen(30, panel_row, desc_col)
+                panel_description = panel_description.strip()
+            else:
+                panel_row += 1
+                if panel_row == 19:
+                    bzio.PF8()
+                    panel_row = 14
+            if the_code == "  ":
+                break
+        bzio.PF3()
+    else:
+        panel_description = "Blank"
+
+    return panel_description
+
+class CAFS_panel:
+    def __init__(self):
+        pass
+
+    def navigate_to(self):
+        current_page = bzio.ReadScreen(22, 2, 28)
+        if current_page != "Case Financial Summary":
+            FuncLib.navigate_to_PRISM_screen("CAFS")
+
+    def gather_data(self):
+
+        self.navigate_to()
+
+        self.monthly_accrual = FuncLib.read_float_from_BZ(9, 9, 30)
+        self.monthly_non_accrual = FuncLib.read_float_from_BZ(9, 10, 30)
+        self.unpaid_monthly_accrual = FuncLib.read_float_from_BZ(9, 11, 30)
+        self.unpaid_mo_non_accrual = FuncLib.read_float_from_BZ(9, 12,30)
+        self.past_due = FuncLib.read_float_from_BZ(9,13,30)
+        self.total_due = FuncLib.read_float_from_BZ(9, 14, 30)
+        self.suspense = FuncLib.read_float_from_BZ(9, 9, 69)
+        self.NPA_arrears = FuncLib.read_float_from_BZ(9, 10, 69)
+        self.PA_arrears = FuncLib.read_float_from_BZ(9, 11, 69)
+        self.total_arrears = FuncLib.read_float_from_BZ(9, 12, 69)
+        if bzio.ReadScreen(1, 13, 35) == "Y":
+            self.holds = True
+        else:
+            self.holds = False
+        if bzio.ReadScreen(1, 14, 35) == "Y":
+            self.offset = True
+        else:
+            self.offset = False
+
+        self.obligation_info = []
+        numb_of_debts = bzio.ReadScreen(2, 15, 71)
+        numb_of_debts = numb_of_debts.strip()
+        numb_of_debts = int(numb_of_debts)
+
+        debt_type_codes = {"ADF": "Administrative Fund Fee",
+                           "AFC": "AFDC/MFIP/MA Obligation",
+                           "APF": "Application Fees",
+                           "ATF": "Attorney Fees",
+                           "CAF": "Case Fee (Non-IV-D)",
+                           "CCC": "Child Care",
+                           "CHF": "Clearinghouse Fees",
+                           "CPI": "CP Tax Intercept Fee",
+                           "CRF": "Cost Recovery Fee",
+                           "CTF": "Court Ordered Costs",
+                           "DPR": "Direct Payment Recovery",
+                           "FAF": "Federal Annual Fee",
+                           "FCC": "IV-E Foster Care Obligation",
+                           "FIF": "Full IRS Fee",
+                           "FPL": "Federal Parent Locate Fee",
+                           "GTF": "Genetic Testing Fees",
+                           "IRA": "IRS Adjustment",
+                           "MDN": "Medical Due NCP",
+                           "NIF": "Non IV-D Service Fee",
+                           "NPA": "Non Public Assistance Obligation",
+                           "NSF": "Non Sufficient Fund Fee",
+                           "NSR": "NSF/Posting Error Recoupment",
+                           "N4D": "Non IV-D Obligation",
+                           "OVP": "CP Overpayment",
+                           "RED": "Retro Debt",
+                           "SEF": "Service Fee (Not Court Order)",
+                           "SOP": "Service of Process Fee"}
+
+        obligation_codes = {}
+
+        for debts in range[1:numb_of_debts]:
+            bzio.WriteScreen(debts, 15, 57)
+            bzio.Transmit()
+
+            nbr = bzio.ReadScreen(2, 17, 2)
+            status = bzio.ReadScreen(1, 17, 6)
+            if status == "A":
+                status = "Active"
+            elif status == "I":
+                status = "Inactive"
+            suppress = bzio.ReadScreen(1, 17, 9)
+            if suppress == "Y":
+                suppress = "Yes"
+            else:
+                suppress = "No"
+            debt_type = debt_type_codes[bzio.ReadScreen(3, 17, 13)]
+            obligation = obligation_codes[bzio.ReadScreen(3, 17, 18)]
+            method = bzio.ReadScreen(1, 17, 22)
+            accrual = FuncLib.read_float_from_BZ(7, 17, 26)
+            mo_oblig = FuncLib.read_float_from_BZ(7, 17, 36)
+            begin_date = "%s/%s/%s" % (bzio.ReadScreen(2, 17, 44), bzio.ReadScreen(2, 17, 47), bzio.ReadScreen(2, 17, 50))
+            balance = FuncLib.read_float_from_BZ(9, 17, 54)
+            court_file = bzio.ReadScreen(16, 17, 64).strip()
+
+            self.obligation_info.append([nbr, status, suppress, debt_type, obligation, ])
+
+
 class NCDE_panel:
     def __init__(self, mci):
         self.mci = mci
@@ -61,6 +183,17 @@ class NCDE_panel:
                       "98": "Other",
                       "99": "English",
                       "__": "Blank"}
+
+    global military_branch_codes
+    military_branch_codes = {"AIF": "Air Force",
+                             "ANG": "Air National Guard",
+                             "ARM": "Army",
+                             "COG": "Coast Guard",
+                             "MAR": "Marines",
+                             "NAV": "Navy",
+                             "RES": "Reserves",
+                             "RNG": "Regular Army National Guard",
+                             "___": "None"}
 
     def find_language(self, row, col):
         panel_code = bzio.ReadScreen(2, row, col)
@@ -179,3 +312,26 @@ class NCDE_panel:
 
         self.unique_phys_marks = "%s %s" % (bzio.ReadScreen(60, 17, 19).replace("_", ""), bzio.ReadScreen(60, 18, 19).replace("_", ""))
         self.spec_cond = bzio.ReadScreen(66, 19, 13).replace("_", "")
+
+        bzio.PF11()
+
+        self.tribe = bzio.ReadScreen(25, 8, 12).strip()
+
+        self.mother_last_name = bzio.ReadScreen(17, 10, 24).replace("_", "")
+        self.mother_first_name = bzio.ReadScreen(12, 10, 50).replace("_", "")
+        self.monther_middle_initial = bzio.ReadScreen(1, 10, 68).replace("_", "")
+        self.mother_maiden_name = bzio.ReadScreen(17, 11, 24).replace("_", "")
+        self.father_last_name = bzio.ReadScreen(17, 12, 24).replace("_", "")
+        self.father_first_name = bzio.ReadScreen(12, 12, 50).replace("_", "")
+        self.father_middle_initial = bzio.ReadScreen(1, 12, 68).replace("_", "")
+        self.father_suffix = bzio.ReadScreen(3, 12, 76).replace("_", "")
+
+        self.military_branch = military_branch_codes[bzio.ReadScreen(3, 14, 19)]
+        self. military_station = bzio.ReadScreen(25, 14, 42).replace("_", "")
+        if bzio.ReadScreen(1, 14, 78) == "Y":
+            self.veteran = True
+        else:
+            self.veteran = False
+
+        self.military_begin = bzio.ReadScreen(10, 15, 19).replace("_", "")
+        self.military_end = bzio.ReadScreen(10, 15, 48).replace("_", "")
